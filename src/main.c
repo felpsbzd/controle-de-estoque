@@ -23,6 +23,7 @@ int main() {
                 break;
             case 4:
                 printf("Listar Produtos...\n");
+                listarProdutos();
                 break;
             case 5:
                 printf("Remover Produto...\n");
