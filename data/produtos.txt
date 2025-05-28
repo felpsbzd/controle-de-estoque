@@ -1,3 +1,5 @@
 321;2;pure;3
 222;1;beterraba;10
-1;1;Arroz;20
+123;2;marcus; 1
+123456;6;Batata;10
+9999;2;Maconha;9.99

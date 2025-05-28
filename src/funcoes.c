@@ -4,6 +4,34 @@
 #include <stdbool.h>
 
 
+bool buscarProdutoPorCodigo(int codigo, char *linhaEncontrada) {
+    FILE *arquivo = fopen("../data/produtos.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return false;
+    }
+
+    char linha[100];
+    char codigoStr[20];
+    sprintf(codigoStr, "%d", codigo);
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        char linhaCopia[100];
+        strcpy(linhaCopia, linha);
+        linhaCopia[strcspn(linhaCopia, "\n")] = '\0';
+
+        char *token = strtok(linhaCopia, ";");
+        if (token && strcmp(token, codigoStr) == 0) {
+            strcpy(linhaEncontrada, linha);
+            fclose(arquivo);
+            return true;
+        }
+    }
+
+    fclose(arquivo);
+    return false;
+}
+
 
 void mostrarMenu() {
     printf("\n=== MENU ===\n");
@@ -14,33 +42,7 @@ void mostrarMenu() {
     printf("5. Remover Produto\n");
     printf("6. Sair\n");
 }
-bool validarCodigoProduto(int codigo) {
-    FILE *arquivo = fopen("../data/produtos.txt", "r");
-    if (arquivo == NULL) {
-        printf("Erro na abertura do arquivo\n");
-        return;
-    }
-    char linha[50];
-    char *token;
-    bool existe = false;
-    char codigoProduto[50];
-    sprintf(codigoProduto, "%d", codigo);
-    while (fgets(linha, 50, arquivo) != NULL) {
-        linha[strcspn(linha, "\n")] = '\0';
-        token = strtok(linha, ";");
-        if(token!=NULL) {
-            if(strcmp(token, codigoProduto)==0) {
-                existe = true;
-                fclose(arquivo);
-                return existe;
-            }
-        }
 
-
-
-
-    }
-}
 
 
 void cadastrarProduto() {
@@ -52,11 +54,12 @@ void cadastrarProduto() {
 int codigo,quantidade;
     float valor;
     char nome[50];
+    char linha[50];
     bool existe = false;
 do {
     printf("Digite o codigo do produto: ");
     scanf("%d", &codigo);
-    existe = validarCodigoProduto(codigo);
+    existe = buscarProdutoPorCodigo(codigo,linha);
     if (existe == true) {
          printf("Codigo do produto ja existe\n");
     }
@@ -68,44 +71,39 @@ do {
     printf("Digite o valor do produto: ");
     scanf("%f", &valor);
 
-    fprintf(arquivo, "%d;%d;%s;%2.f\n", codigo, quantidade,nome,valor);
+    fprintf(arquivo, "%d;%d;%s;%.2f\n", codigo, quantidade,nome,valor);
     fclose(arquivo);
 }
-void consultarProduto () {
-    FILE *arquivo = fopen("../data/produtos.txt", "r");
-    if (arquivo == NULL) {
-        printf("Erro na abertura do arquivo\n");
-        return;
-    }
+void consultarProduto() {
     int codigo;
-    char linha[50];
-    char *token;
-    bool existe = false;
-    char codigoProduto[50];
-    char linha_copia[50];
+    char linhaOriginal[100];
+    char linha[100];
+    int cod, qtd;
+    float preco;
+    char nome[50];
+
     printf("Digite o codigo do produto: ");
     scanf("%d", &codigo);
-    sprintf(codigoProduto, "%d", codigo);
 
-    while (fgets(linha, 50, arquivo) != NULL) {
-        linha[strcspn(linha, "\n")] = '\0';
-        strcpy(linha_copia, linha);
-        token = strtok(linha_copia, ";");
-        if(token!=NULL) {
-            if(strcmp(token, codigoProduto)==0) {
-                existe = true;
-                printf("Produto encontrado!\n");
-                printf("Aqui esta as informacoes dele: %s\n", linha);
-                fclose(arquivo);
-                return;
-            }
+    if (buscarProdutoPorCodigo(codigo, linhaOriginal)) {
+        strcpy(linha, linhaOriginal); // Copia para não modificar o original
 
+        if (sscanf(linha, "%d;%d;%[^;];%f", &cod, &qtd, nome, &preco) == 4) {
+            printf("\n=== Produto Encontrado ===\n");
+            printf("Codigo: %d\n", cod);
+            printf("Quantidade: %d\n", qtd);
+            printf("Nome: %s\n", nome);
+            printf("Preco: %.2f\n", preco);
+        } else {
+            printf("Erro ao interpretar os dados do produto.\n");
         }
+    } else {
+        printf("Produto nao encontrado.\n");
+    }
+}
 
-    }
-    printf("produto nao existe\n");
-    fclose(arquivo);
-    }
+
+
 
 
 
