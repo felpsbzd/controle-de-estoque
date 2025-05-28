@@ -1,7 +1,0 @@
-*.exe
-*.o
-*.out
-*.log
-*.tmp
-*.bak
-data/*.txt
