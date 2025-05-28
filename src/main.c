@@ -16,6 +16,7 @@ int main() {
                 break;
             case 2:
                 printf("Consultar Produto...\n");
+                consultarProduto();
                 break;
             case 3:
                 printf("Atualizar Estoque...\n");
