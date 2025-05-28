@@ -1,24 +1,36 @@
-//
-// Created by ACER on 27/05/2025.
-//
-
 #include <stdio.h>
-#include <stdlib.h>
-
 #include "funcoes.h"
 
-
 int main() {
-    switch () {
-        case 1: cadastrarProduto();
-            break;
-        case 2:consultarProduto();
-            break;
-        case 3:listarProdutos();
-            break;
-        case 4:removerProduto();
-            break;
+    int opcao;
+    do {
+        mostrarMenu();
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch(opcao) {
+            case 1:
+                printf("Cadastrar Produto...\n");
+                break;
+            case 2:
+                printf("Consultar Produto...\n");
+                break;
+            case 3:
+                printf("Atualizar Estoque...\n");
+                break;
+            case 4:
+                printf("Listar Produtos...\n");
+                break;
+            case 5:
+                printf("Remover Produto...\n");
+                break;
+            case 6:
+                printf("Saindo...\n");
+                break;
             default:
-            break;
-    }
+                printf("Opcao invalida.\n");
+        }
+    } while(opcao != 6);
+
+    return 0;
 }
