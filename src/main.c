@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "funcoes.h"
+#include <stdlib.h>
 
 int main() {
     int opcao;
@@ -11,9 +12,11 @@ int main() {
         switch(opcao) {
             case 1:
                 printf("Cadastrar Produto...\n");
+                cadastrarProduto();
                 break;
             case 2:
                 printf("Consultar Produto...\n");
+                consultarProduto();
                 break;
             case 3:
                 printf("Atualizar Estoque...\n");
