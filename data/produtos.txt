@@ -1,2 +1,3 @@
 321;2;pure;3
 222;1;beterraba;10
+1;1;Arroz;20
