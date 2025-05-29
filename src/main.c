@@ -16,11 +16,11 @@ int main() {
         switch(opcao) {
             case 1:
                 printf("Cadastrar Produto...\n");
-                cadastrarProduto();
+                cadastrarProduto(listaDeProdutos, &quantidadeLida);
                 break;
             case 2:
                 printf("Consultar Produto...\n");
-                consultarProduto();
+                consultarProduto(listaDeProdutos,&quantidadeLida);
                 break;
             case 3:
                 printf("Atualizar Estoque...\n");

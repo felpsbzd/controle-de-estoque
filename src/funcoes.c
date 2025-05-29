@@ -3,6 +3,26 @@
 #include <string.h>
 #include <stdbool.h>
 
+void salvarProdutosNoArquivo(Produto lista[], int tamanho) {
+
+    FILE *arquivo = fopen("../data/produtos.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao salvar os produtos no arquivo! Verifique o caminho ou permissoes.\n");
+        return;
+    }
+
+
+    for (int i = 0; i < tamanho; i++) {
+        fprintf(arquivo, "%d;%d;%s;%.2f\n",
+                lista[i].codigo,
+                lista[i].quantidade,
+                lista[i].nome,
+                lista[i].valor);
+    }
+
+    fclose(arquivo);
+}
+
 int carregarProdutos(Produto lista[], int maxTam) {
     FILE *arquivo = fopen("../data/produtos.txt", "r");
     int count = 0;
@@ -19,39 +39,22 @@ int carregarProdutos(Produto lista[], int maxTam) {
         if (count >= maxTam) break;
                   }
     fclose(arquivo);
-    printf("Produto criado com sucesso.\n");
+    printf("lista de produtos criada com sucesso.\n");
     printf("quantidade de produtos: %d\n", count);
     return count; // retorna quantos produtos foram lidos
 }
 
 
-bool buscarProdutoPorCodigo(int codigo, char *linhaEncontrada) {
-    FILE *arquivo = fopen("../data/produtos.txt", "r");
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
-        return false;
-    }
-
-    char linha[100];
-    char codigoStr[20];
-    sprintf(codigoStr, "%d", codigo);
-
-    while (fgets(linha, sizeof(linha), arquivo)) {
-        char linhaCopia[100];
-        strcpy(linhaCopia, linha);
-        linhaCopia[strcspn(linhaCopia, "\n")] = '\0';
-
-        char *token = strtok(linhaCopia, ";");
-        if (token && strcmp(token, codigoStr) == 0) {
-            strcpy(linhaEncontrada, linha);
-            fclose(arquivo);
-            return true;
+    int buscarProdutoPorCodigo(int codigo, Produto lista[],int *tamanho) {
+        int indice;
+    for (indice = 0; indice < *tamanho; indice++) {
+        if (lista[indice].codigo == codigo) {
+            return indice;
         }
     }
 
-    fclose(arquivo);
-    return false;
-}
+        return -1;
+    }
 
 
 void mostrarMenu() {
@@ -66,58 +69,80 @@ void mostrarMenu() {
 
 
 
-void cadastrarProduto() {
-    FILE *arquivo = fopen("../data/produtos.txt", "a");
-    if (arquivo == NULL) {
-        printf("Erro na abertura do arquivo\n");
+void cadastrarProduto(Produto lista[], int *tamanho) {
+    if (*tamanho >= MAX_PRODUTOS) { // Verifica se há espaço no vetor
+        printf("Estoque cheio! Nao e possivel cadastrar mais produtos.\n");
         return;
     }
-int codigo,quantidade;
-    float valor;
-    char nome[50];
-    char linha[50];
-    bool existe = false;
-do {
-    printf("Digite o codigo do produto: ");
-    scanf("%d", &codigo);
-    existe = buscarProdutoPorCodigo(codigo,linha);
-    if (existe == true) {
-         printf("Codigo do produto ja existe\n");
-    }
-}while (existe == true);
-    printf("Digite o quantidade do produto: ");
-    scanf("%d", &quantidade);
-    printf("Digite o nome do produto: ");
-    scanf("%s", nome);
-    printf("Digite o valor do produto: ");
-    scanf("%f", &valor);
 
-    fprintf(arquivo, "%d;%d;%s;%.2f\n", codigo, quantidade,nome,valor);
-    fclose(arquivo);
-}
-void consultarProduto() {
     int codigo;
-    char linhaOriginal[100];
-    char linha[100];
-    int cod, qtd;
-    float preco;
-    char nome[50];
+    int indiceExistente;
+    int c;
 
+    do {
+        printf("Digite o codigo do produto: ");
+        // Limpa o buffer do teclado antes de ler o código
+        // Isso é uma boa prática para evitar problemas com entradas anteriores.
+
+        while ((c = getchar()) != '\n' && c != EOF); //
+
+        scanf("%d", &codigo);
+        indiceExistente = buscarProdutoPorCodigo(codigo, lista, tamanho);
+        if (indiceExistente != -1) {
+             printf("Codigo do produto ja existe. Por favor, digite outro.\n");
+        }
+    } while (indiceExistente != -1);
+
+
+    lista[*tamanho].codigo = codigo;
+
+    printf("Digite a quantidade do produto: ");
+    // Correção: scanf precisa do endereço do membro da struct
+    scanf("%d", &lista[*tamanho].quantidade);
+
+    // Limpa o buffer do teclado novamente ANTES de ler a string com fgets
+    // Crucial para que fgets leia o nome corretamente e não a quebra de linha do scanf anterior.
+    while ((c = getchar()) != '\n' && c != EOF); //
+
+    printf("Digite o nome do produto: ");
+    // Usar fgets para ler strings com espaços.
+    // O sizeof garante que não haverá buffer overflow.
+    fgets(lista[*tamanho].nome, sizeof(lista[*tamanho].nome), stdin);
+    // Remove o '\n' que fgets pode ter lido (se couber no buffer)
+    lista[*tamanho].nome[strcspn(lista[*tamanho].nome, "\n")] = '\0';
+
+    printf("Digite o valor do produto: ");
+
+    scanf("%f", &lista[*tamanho].valor);
+
+
+    (*tamanho)++;
+
+    printf("Produto cadastrado com sucesso!\n");
+
+    salvarProdutosNoArquivo(lista, *tamanho);
+}
+void consultarProduto(Produto lista[], int *tamanho) {
+    int codigo;
+    int indiceEncontrado;
+    int c;
     printf("Digite o codigo do produto: ");
+
+
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa o buffer do teclado antes de ler o código
+
     scanf("%d", &codigo);
 
-    if (buscarProdutoPorCodigo(codigo, linhaOriginal)) {
-        strcpy(linha, linhaOriginal); // Copia para não modificar o original
 
-        if (sscanf(linha, "%d;%d;%[^;];%f", &cod, &qtd, nome, &preco) == 4) {
-            printf("\n=== Produto Encontrado ===\n");
-            printf("Codigo: %d\n", cod);
-            printf("Quantidade: %d\n", qtd);
-            printf("Nome: %s\n", nome);
-            printf("Preco: %.2f\n", preco);
-        } else {
-            printf("Erro ao interpretar os dados do produto.\n");
-        }
+    indiceEncontrado = buscarProdutoPorCodigo(codigo, lista, tamanho);
+
+    if (indiceEncontrado != -1) {
+        // Acessa o produto diretamente no vetor usando o índice
+        printf("\n=== Produto Encontrado ===\n");
+        printf("Codigo: %d\n", lista[indiceEncontrado].codigo);
+        printf("Quantidade: %d\n", lista[indiceEncontrado].quantidade);
+        printf("Nome: %s\n", lista[indiceEncontrado].nome);
+        printf("Preco: %.2f\n", lista[indiceEncontrado].valor);
     } else {
         printf("Produto nao encontrado.\n");
     }
