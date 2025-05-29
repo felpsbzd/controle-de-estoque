@@ -3,6 +3,27 @@
 #include <string.h>
 #include <stdbool.h>
 
+int carregarProdutos(Produto lista[], int maxTam) {
+    FILE *arquivo = fopen("../data/produtos.txt", "r");
+    int count = 0;
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 0;
+    }
+    while (fscanf(arquivo, "%d;%d;%[^;];%f\n",
+                  &lista[count].codigo,
+                  &lista[count].quantidade,
+                  lista[count].nome,
+                  &lista[count].valor) == 4) {
+        count++;
+        if (count >= maxTam) break;
+                  }
+    fclose(arquivo);
+    printf("Produto criado com sucesso.\n");
+    printf("quantidade de produtos: %d\n", count);
+    return count; // retorna quantos produtos foram lidos
+}
+
 
 bool buscarProdutoPorCodigo(int codigo, char *linhaEncontrada) {
     FILE *arquivo = fopen("../data/produtos.txt", "r");

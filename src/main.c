@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include "funcoes.h"
 #include <stdlib.h>
+#include <string.h>
+
 
 int main() {
     int opcao;
+    Produto listaDeProdutos[MAX_PRODUTOS];
+    int quantidadeLida = carregarProdutos(listaDeProdutos, MAX_PRODUTOS);
     do {
         mostrarMenu();
         printf("Escolha uma opcao: ");
