@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include "funcoes.h"
 #include <stdlib.h>
+#include <string.h>
+
 
 int main() {
     int opcao;
+    Produto listaDeProdutos[MAX_PRODUTOS];
+    int quantidadeLida = carregarProdutos(listaDeProdutos, MAX_PRODUTOS);
     do {
         mostrarMenu();
         printf("Escolha uma opcao: ");
@@ -12,21 +16,23 @@ int main() {
         switch(opcao) {
             case 1:
                 printf("Cadastrar Produto...\n");
-                cadastrarProduto();
+                cadastrarProduto(listaDeProdutos, &quantidadeLida);
                 break;
             case 2:
                 printf("Consultar Produto...\n");
-                consultarProduto();
+                consultarProduto(listaDeProdutos,&quantidadeLida);
                 break;
             case 3:
                 printf("Atualizar Estoque...\n");
+                atualizarEstoque(listaDeProdutos, &quantidadeLida);
                 break;
             case 4:
                 printf("Listar Produtos...\n");
-                listarProdutos();
+                listarProdutos(listaDeProdutos, quantidadeLida);
                 break;
             case 5:
                 printf("Remover Produto...\n");
+                removerProduto(listaDeProdutos, &quantidadeLida);
                 break;
             case 6:
                 printf("Saindo...\n");
