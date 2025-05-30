@@ -24,12 +24,15 @@ int main() {
                 break;
             case 3:
                 printf("Atualizar Estoque...\n");
+                atualizarEstoque(listaDeProdutos, &quantidadeLida);
                 break;
             case 4:
                 printf("Listar Produtos...\n");
+                listarProdutos(listaDeProdutos, quantidadeLida);
                 break;
             case 5:
                 printf("Remover Produto...\n");
+                removerProduto(listaDeProdutos, &quantidadeLida);
                 break;
             case 6:
                 printf("Saindo...\n");

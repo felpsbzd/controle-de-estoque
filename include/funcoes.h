@@ -16,7 +16,7 @@ void mostrarMenu();
 void cadastrarProduto(Produto lista[], int *tamanho);
 void consultarProduto(Produto lista[], int *tamanho);
 void atualizarEstoque(Produto lista[], int *tamanho);;
-void listarProdutos(Produto lista[], int *tamanho);
+void listarProdutos(Produto lista[], int tamanho);
 void removerProduto(Produto lista[], int *tamanho);
 
 //funções auxiliares

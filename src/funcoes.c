@@ -148,10 +148,120 @@ void consultarProduto(Produto lista[], int *tamanho) {
 }
 
 
+void atualizarEstoque(Produto lista[], int *tamanho) {
+    printf("\n--- Atualizar Estoque ---\n");
+
+    int codigoBusca;
+    int quantidadeAtualizar;
+    int indiceEncontrado;
+    int c; // Para limpeza de buffer
+
+    if (*tamanho == 0) {
+        printf("Nenhum produto cadastrado para atualizar.\n");
+        return;
+    }
+
+    printf("Digite o codigo do produto que deseja atualizar: ");
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
+    scanf("%d", &codigoBusca);
+
+    printf("Digite a quantidade a adicionar (+) ou remover (-): ");
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
+    scanf("%d", &quantidadeAtualizar);
+
+    indiceEncontrado = buscarProdutoPorCodigo(codigoBusca, lista, tamanho); // Usa a nova busca
+
+    if (indiceEncontrado == -1) {
+        printf("Erro: Produto com codigo %d nao encontrado.\n", codigoBusca);
+        return;
+    }
+
+    // Atualiza no vetor
+    int quantidadeAtual = lista[indiceEncontrado].quantidade;
+    int novaQuantidade = quantidadeAtual + quantidadeAtualizar;
+
+    if (novaQuantidade < 0) {
+        printf("\nAviso: Operacao deixaria o estoque negativo (ficaria %d). Ajustando para 0.\n", novaQuantidade);
+        novaQuantidade = 0;
+    }
+
+    lista[indiceEncontrado].quantidade = novaQuantidade;
+    printf("Estoque em memoria atualizado para %d unidades.\n", novaQuantidade);
+
+    // Salva no arquivo
+    salvarProdutosNoArquivo(lista, *tamanho);
+    printf("Estoque do produto %d atualizado com sucesso no arquivo!\n", codigoBusca);
+}
 
 
+void listarProdutos(Produto lista[], int tamanho) { // Recebe tamanho por valor, não ponteiro
+    printf("\n======= LISTA DE PRODUTOS =========\n");
+
+    if (tamanho == 0) {
+        printf("Nenhum produto cadastrado ainda.\n");
+        printf("---------------------------------------------\n");
+        return;
+    }
+
+    printf("Codigo | Nome           | Quantidade | Preco \n");
+    printf("---------------------------------------------\n");
+
+    for (int i = 0; i < tamanho; i++) {
+        printf("%-6d | %-14s | %-10d | R$%.2f\n",
+               lista[i].codigo,
+               lista[i].nome,
+               lista[i].quantidade,
+               lista[i].valor);
+    }
+    printf("---------------------------------------------\n");
+}
 
 
+void removerProduto(Produto lista[], int *tamanho) {
+    printf("\n--- Remover Produto ---\n");
 
+    int codigoBusca;
+    int indiceRemover;
+    int c;
 
+    if (*tamanho == 0) {
+        printf("Nenhum produto cadastrado para remover.\n");
+        return;
+    }
 
+    printf("Digite o codigo do produto que deseja remover: ");
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
+    scanf("%d", &codigoBusca);
+
+    indiceRemover = buscarProdutoPorCodigo(codigoBusca, lista, tamanho);
+
+    if (indiceRemover == -1) {
+        printf("Erro: Produto com codigo %d nao encontrado.\n", codigoBusca);
+        return;
+    }
+
+    // Confirmação (Opcional, mas recomendado)
+    printf("Tem certeza que deseja remover o produto '%s' (Codigo: %d)? (s/n): ", lista[indiceRemover].nome, codigoBusca);
+    char confirmacao;
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
+    scanf(" %c", &confirmacao); // Espaço antes de %c ignora espaços/newlines
+
+    if (confirmacao != 's' && confirmacao != 'S') {
+        printf("Remocao cancelada.\n");
+        return;
+    }
+
+    // Lógica de Remoção: Desloca os elementos posteriores uma posição para trás
+    for (int i = indiceRemover; i < (*tamanho - 1); i++) {
+        lista[i] = lista[i + 1];
+    }
+
+    // Diminui o tamanho lógico do vetor
+    (*tamanho)--;
+
+    printf("Produto %d removido da memoria.\n", codigoBusca);
+
+    // Salva o estado atualizado no arquivo
+    salvarProdutosNoArquivo(lista, *tamanho);
+    printf("Alteracoes salvas no arquivo.\n");
+}
