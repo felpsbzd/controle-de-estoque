@@ -102,7 +102,7 @@ void cadastrarProduto(Produto lista[], int *tamanho) {
 
     // Limpa o buffer do teclado novamente ANTES de ler a string com fgets
     // Crucial para que fgets leia o nome corretamente e não a quebra de linha do scanf anterior.
-    while ((c = getchar()) != '\n' && c != EOF); //
+    while ((c = getchar()) != '\n' && c != EOF);
 
     printf("Digite o nome do produto: ");
     // Usar fgets para ler strings com espaços.
@@ -114,7 +114,6 @@ void cadastrarProduto(Produto lista[], int *tamanho) {
     printf("Digite o valor do produto: ");
 
     scanf("%f", &lista[*tamanho].valor);
-
 
     (*tamanho)++;
 

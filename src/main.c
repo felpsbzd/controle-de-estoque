@@ -33,6 +33,7 @@ int main() {
                 break;
             case 6:
                 printf("Saindo...\n");
+                salvarProdutosNoArquivo(listaDeProdutos, quantidadeLida);
                 break;
             default:
                 printf("Opcao invalida.\n");
