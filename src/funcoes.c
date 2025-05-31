@@ -195,26 +195,54 @@ void atualizarEstoque(Produto lista[], int *tamanho) {
 }
 
 
-void listarProdutos(Produto lista[], int tamanho) { // Recebe tamanho por valor, não ponteiro
-    printf("\n======= LISTA DE PRODUTOS =========\n");
+void listarProdutos(Produto lista[], int tamanho) {
+    printf("\n======= LISTA DE PRODUTOS ========\n");
 
     if (tamanho == 0) {
         printf("Nenhum produto cadastrado ainda.\n");
-        printf("---------------------------------------------\n");
+        printf("-----------------------------------------------------------\n");
         return;
     }
 
-    printf("Codigo | Nome           | Quantidade | Preco \n");
-    printf("---------------------------------------------\n");
-
-    for (int i = 0; i < tamanho; i++) {
-        printf("%-6d | %-14s | %-10d | R$%.2f\n",
-               lista[i].codigo,
-               lista[i].nome,
-               lista[i].quantidade,
-               lista[i].valor);
+    //Criando uma cópia temporária do vetor
+    Produto listaOrdenada[tamanho]; // Usando VLA
+    // Verifica se a criação do VLA deu certo
+    if (tamanho > 0 && !listaOrdenada) {
+        printf("Erro: Falha ao alocar memoria para ordenacao.\n");
+        return;
     }
-    printf("---------------------------------------------\n");
+    memcpy(listaOrdenada, lista, tamanho * sizeof(Produto)); // Copia os dados
+
+    //Ordenar a cópia (listaOrdenada) usando Bubble Sort pelo código
+    bool trocou;
+    for (int i = 0; i < tamanho - 1; i++) {
+        trocou = false;
+        for (int j = 0; j < tamanho - 1 - i; j++) {
+            if (listaOrdenada[j].codigo > listaOrdenada[j + 1].codigo) {
+                Produto temp = listaOrdenada[j];
+                listaOrdenada[j] = listaOrdenada[j + 1];
+                listaOrdenada[j + 1] = temp;
+                trocou = true;
+            }
+        }
+        if (!trocou) {
+            break;
+        }
+    }
+
+    printf("Codigo | Nome                     | Quantidade | Preco \n");
+    printf("-----------------------------------------------------------\n");
+
+    //Imprimir a CÓPIA ORDENADA
+    for (int i = 0; i < tamanho; i++) {
+        //Usa listaOrdenada[i] aqui
+        printf("%-6d | %-25s | %-10d | R$%.2f\n",
+               listaOrdenada[i].codigo,
+               listaOrdenada[i].nome,
+               listaOrdenada[i].quantidade,
+               listaOrdenada[i].valor);
+    }
+    printf("-----------------------------------------------------------\n");
 }
 
 
