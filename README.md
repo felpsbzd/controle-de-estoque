@@ -97,4 +97,12 @@ Ao executar o programa, um menu principal será exibido. Você pode escolher uma
 * `data/produtos.txt`: Arquivo de texto utilizado para armazenar os dados dos produtos de forma persistente.
 
 ---
+## Apoie o Projeto
 
+Se você gostou deste projeto e gostaria de apoiar o desenvolvimento contínuo, qualquer contribuição é muito bem-vinda!
+
+Você pode apoiar o projeto através da minha chave Pix:
+
+**Chave Pix:** `86981849385`
+
+Agradeço imensamente o seu apoio!
