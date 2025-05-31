@@ -1,6 +1,7 @@
 # Controle de Estoque para Pequenos Negócios
 
 [Link para o Repositório no GitHub](https://github.com/felpsbzd/controle-de-estoque.git)
+
 Este projeto é um sistema simples de controle de estoque desenvolvido em linguagem C, focado em demonstrar conceitos de estruturas de dados (vetores ordenados), algoritmos de busca (busca binária) e manipulação de arquivos para persistência de dados. [cite: 2]
 
 ## Funcionalidades
