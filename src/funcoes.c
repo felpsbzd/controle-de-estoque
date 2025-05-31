@@ -22,7 +22,25 @@ void salvarProdutosNoArquivo(Produto lista[], int tamanho) {
 
     fclose(arquivo);
 }
-
+void ordenarLista (Produto lista[], int tamanho) {
+    bool trocou;
+    int i;
+    int j;
+    for (i = 0; i < tamanho - 1; i++) {
+        trocou = false;
+        for (j = 0; j < tamanho - 1 - i; j++) {
+            if (lista[j].codigo > lista[j + 1].codigo) {
+                Produto temp = lista[j];
+                lista[j] = lista[j + 1];
+                lista[j + 1] = temp;
+                trocou = true;
+            }
+        }
+        if (!trocou) {
+            break;
+        }
+    }
+}
 int carregarProdutos(Produto lista[], int maxTam) {
     FILE *arquivo = fopen("../data/produtos.txt", "r");
     int count = 0;
@@ -38,6 +56,7 @@ int carregarProdutos(Produto lista[], int maxTam) {
         count++;
         if (count >= maxTam) break;
                   }
+    ordenarLista(lista, count);
     fclose(arquivo);
     printf("lista de produtos criada com sucesso.\n");
     printf("quantidade de produtos: %d\n", count);
@@ -46,16 +65,33 @@ int carregarProdutos(Produto lista[], int maxTam) {
 
 
     int buscarProdutoPorCodigo(int codigo, Produto lista[],int *tamanho) {
-        int indice;
-    for (indice = 0; indice < *tamanho; indice++) {
-        if (lista[indice].codigo == codigo) {
-            return indice;
+    return buscarProdutoBinario(codigo, lista, *tamanho);
+    }
+int buscarProdutoBinario(int codigo, Produto lista[], int tamanho) {
+    int esquerda = 0;
+    int direita = tamanho - 1;
+    int meio;
+
+    while (esquerda <= direita) {
+        meio = esquerda + (direita - esquerda) / 2; // Evita overflow para grandes 'esquerda' e 'direita'
+
+        // Verifica se o elemento do meio é o código procurado
+        if (lista[meio].codigo == codigo) {
+            return meio; // Produto encontrado, retorna o índice
+        }
+
+        // Se o código procurado for maior, ignore a metade esquerda
+        if (lista[meio].codigo < codigo) {
+            esquerda = meio + 1;
+        }
+        // Se o código procurado for menor, ignore a metade direita
+        else {
+            direita = meio - 1;
         }
     }
 
-        return -1;
-    }
-
+    return -1; // Produto não encontrado
+}
 
 void mostrarMenu() {
     printf("\n=== MENU ===\n");
@@ -79,46 +115,55 @@ void cadastrarProduto(Produto lista[], int *tamanho) {
     int indiceExistente;
     int c;
 
+    // --- Limpeza do buffer inicial (boa prática) ---
+    while ((c = getchar()) != '\n' && c != EOF);
+
     do {
         printf("Digite o codigo do produto: ");
-        // Limpa o buffer do teclado antes de ler o código
-        // Isso é uma boa prática para evitar problemas com entradas anteriores.
-
-        while ((c = getchar()) != '\n' && c != EOF); //
-
         scanf("%d", &codigo);
-        indiceExistente = buscarProdutoPorCodigo(codigo, lista, tamanho);
-        if (indiceExistente != -1) {
+        // Usamos buscarProdutoPorCodigo (que agora usa busca binaria)
+        indiceExistente = buscarProdutoPorCodigo(codigo, lista, tamanho); // Passa o vetor e o ponteiro para o tamanho
+        if (indiceExistente != -1) { // Se retornar um índice diferente de -1, o código já existe
              printf("Codigo do produto ja existe. Por favor, digite outro.\n");
         }
     } while (indiceExistente != -1);
 
-
-    lista[*tamanho].codigo = codigo;
+    // --- Cria um novo produto temporário com os dados lidos ---
+    Produto novoProduto;
+    novoProduto.codigo = codigo;
 
     printf("Digite a quantidade do produto: ");
-    // Correção: scanf precisa do endereço do membro da struct
-    scanf("%d", &lista[*tamanho].quantidade);
+    scanf("%d", &novoProduto.quantidade);
 
     // Limpa o buffer do teclado novamente ANTES de ler a string com fgets
-    // Crucial para que fgets leia o nome corretamente e não a quebra de linha do scanf anterior.
     while ((c = getchar()) != '\n' && c != EOF);
 
     printf("Digite o nome do produto: ");
-    // Usar fgets para ler strings com espaços.
-    // O sizeof garante que não haverá buffer overflow.
-    fgets(lista[*tamanho].nome, sizeof(lista[*tamanho].nome), stdin);
-    // Remove o '\n' que fgets pode ter lido
-    lista[*tamanho].nome[strcspn(lista[*tamanho].nome, "\n")] = '\0';
+    fgets(novoProduto.nome, sizeof(novoProduto.nome), stdin);
+    novoProduto.nome[strcspn(novoProduto.nome, "\n")] = '\0';
 
     printf("Digite o valor do produto: ");
+    scanf("%f", &novoProduto.valor);
 
-    scanf("%f", &lista[*tamanho].valor);
+    // --- Lógica para Inserção Ordenada ---
+    // Encontra a posição correta para inserir o novo produto mantendo a ordem crescente por código
+    int i = *tamanho - 1; // Começa do último elemento preenchido
+    // Percorre a lista de trás para frente, enquanto o elemento atual for maior que o novo produto
+    // e ainda estiver dentro dos limites do array
+    while (i >= 0 && lista[i].codigo > novoProduto.codigo) {
+        lista[i + 1] = lista[i]; // Desloca o elemento para a direita
+        i--;
+    }
 
+    // Insere o novo produto na posição encontrada (i + 1)
+    lista[i + 1] = novoProduto;
+
+    // --- Incrementa o número de produtos após o cadastro bem-sucedido ---
     (*tamanho)++;
 
-    printf("Produto cadastrado com sucesso!\n");
+    printf("Produto cadastrado com sucesso e lista ordenada!\n");
 
+    // Salva todo o vetor no arquivo (agora que ele está ordenado e atualizado)
     salvarProdutosNoArquivo(lista, *tamanho);
 }
 void consultarProduto(Produto lista[], int *tamanho) {
@@ -203,43 +248,20 @@ void listarProdutos(Produto lista[], int tamanho) {
         return;
     }
 
-    //Criando uma cópia temporária do vetor
-    Produto listaOrdenada[tamanho]; // Usando VLA
-    // Verifica se a criação do VLA deu certo
-    if (tamanho > 0 && !listaOrdenada) {
-        printf("Erro: Falha ao alocar memoria para ordenacao.\n");
-        return;
-    }
-    memcpy(listaOrdenada, lista, tamanho * sizeof(Produto)); // Copia os dados
 
-    //Ordenar a cópia (listaOrdenada) usando Bubble Sort pelo código
-    bool trocou;
-    for (int i = 0; i < tamanho - 1; i++) {
-        trocou = false;
-        for (int j = 0; j < tamanho - 1 - i; j++) {
-            if (listaOrdenada[j].codigo > listaOrdenada[j + 1].codigo) {
-                Produto temp = listaOrdenada[j];
-                listaOrdenada[j] = listaOrdenada[j + 1];
-                listaOrdenada[j + 1] = temp;
-                trocou = true;
-            }
-        }
-        if (!trocou) {
-            break;
-        }
-    }
+
 
     printf("Codigo | Nome                     | Quantidade | Preco \n");
     printf("-----------------------------------------------------------\n");
 
     //Imprimir a CÓPIA ORDENADA
     for (int i = 0; i < tamanho; i++) {
-        //Usa listaOrdenada[i] aqui
+
         printf("%-6d | %-25s | %-10d | R$%.2f\n",
-               listaOrdenada[i].codigo,
-               listaOrdenada[i].nome,
-               listaOrdenada[i].quantidade,
-               listaOrdenada[i].valor);
+               lista[i].codigo,
+               lista[i].nome,
+               lista[i].quantidade,
+               lista[i].valor);
     }
     printf("-----------------------------------------------------------\n");
 }
@@ -250,48 +272,52 @@ void removerProduto(Produto lista[], int *tamanho) {
 
     int codigoBusca;
     int indiceRemover;
-    int c;
+    int c; // Variável para a limpeza do buffer
 
+    // 1. Verifica se há produtos na lista
     if (*tamanho == 0) {
         printf("Nenhum produto cadastrado para remover.\n");
         return;
     }
 
     printf("Digite o codigo do produto que deseja remover: ");
-    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
+    // 2. Limpa o buffer antes de ler o código
+    while ((c = getchar()) != '\n' && c != EOF);
     scanf("%d", &codigoBusca);
 
+    // 3. Busca o produto pelo código
     indiceRemover = buscarProdutoPorCodigo(codigoBusca, lista, tamanho);
 
+    // 4. Verifica se o produto foi encontrado
     if (indiceRemover == -1) {
         printf("Erro: Produto com codigo %d nao encontrado.\n", codigoBusca);
         return;
     }
 
-    // Confirmação
+    // 5. Confirmação do usuário
     printf("Tem certeza que deseja remover o produto '%s' (Codigo: %d)? (s/n): ", lista[indiceRemover].nome, codigoBusca);
     char confirmacao;
-    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
-    scanf(" %c", &confirmacao); // Espaço antes de %c ignora espaços/newlines
+    while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer antes de ler a confirmação
+    scanf(" %c", &confirmacao); // O espaço antes de %c ignora qualquer whitespace (como newlines)
 
     if (confirmacao != 's' && confirmacao != 'S') {
         printf("Remocao cancelada.\n");
         return;
     }
 
-    // Lógica de Remoção: Desloca os elementos posteriores uma posição para trás
+    // 6. Lógica de Remoção: Desloca os elementos posteriores uma posição para trás
+    // Percorre do índice do produto a ser removido até o penúltimo elemento
     for (int i = indiceRemover; i < (*tamanho - 1); i++) {
-        lista[i] = lista[i + 1];
-
-
+        lista[i] = lista[i + 1]; // Move o elemento seguinte para a posição atual
     }
 
-    // Diminui o tamanho lógico do vetor
+    // 7. Diminui o tamanho lógico do vetor
     (*tamanho)--;
 
     printf("Produto %d removido da memoria.\n", codigoBusca);
 
-    // Salva o estado atualizado no arquivo
-    salvarProdutosNoArquivo(lista, *tamanho =+ 1);
+    // 8. Salva o estado atualizado no arquivo
+    // CORREÇÃO CRÍTICA AQUI: Use *tamanho (o novo tamanho)
+    salvarProdutosNoArquivo(lista, *tamanho); // <-- CORRIGIDO!
     printf("Alteracoes salvas no arquivo.\n");
 }

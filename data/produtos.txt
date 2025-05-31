@@ -1,5 +1,7 @@
+675;10;brahma;9.50
+1;1011;Picanha Bovina 1.1kg;108.63
 2;1;Stella Artois 200ml;11.99
-1;1010;Picanha Bovina 1.1kg;108.63
 3;1;Alcatra;82.90
 4;1;Costela;60.00
 5;22;Grade Stella Artois 600ml;288.00
+
