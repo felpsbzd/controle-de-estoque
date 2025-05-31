@@ -108,7 +108,7 @@ void cadastrarProduto(Produto lista[], int *tamanho) {
     // Usar fgets para ler strings com espaços.
     // O sizeof garante que não haverá buffer overflow.
     fgets(lista[*tamanho].nome, sizeof(lista[*tamanho].nome), stdin);
-    // Remove o '\n' que fgets pode ter lido (se couber no buffer)
+    // Remove o '\n' que fgets pode ter lido
     lista[*tamanho].nome[strcspn(lista[*tamanho].nome, "\n")] = '\0';
 
     printf("Digite o valor do produto: ");
@@ -269,7 +269,7 @@ void removerProduto(Produto lista[], int *tamanho) {
         return;
     }
 
-    // Confirmação (Opcional, mas recomendado)
+    // Confirmação
     printf("Tem certeza que deseja remover o produto '%s' (Codigo: %d)? (s/n): ", lista[indiceRemover].nome, codigoBusca);
     char confirmacao;
     while ((c = getchar()) != '\n' && c != EOF); // Limpa buffer
