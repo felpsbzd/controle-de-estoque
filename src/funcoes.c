@@ -254,6 +254,8 @@ void removerProduto(Produto lista[], int *tamanho) {
     // Lógica de Remoção: Desloca os elementos posteriores uma posição para trás
     for (int i = indiceRemover; i < (*tamanho - 1); i++) {
         lista[i] = lista[i + 1];
+
+
     }
 
     // Diminui o tamanho lógico do vetor
@@ -262,6 +264,6 @@ void removerProduto(Produto lista[], int *tamanho) {
     printf("Produto %d removido da memoria.\n", codigoBusca);
 
     // Salva o estado atualizado no arquivo
-    salvarProdutosNoArquivo(lista, *tamanho);
+    salvarProdutosNoArquivo(lista, *tamanho =+ 1);
     printf("Alteracoes salvas no arquivo.\n");
 }

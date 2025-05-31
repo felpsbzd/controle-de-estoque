@@ -7,7 +7,7 @@
 int main() {
     int opcao;
     Produto listaDeProdutos[MAX_PRODUTOS];
-    int quantidadeLida = carregarProdutos(listaDeProdutos, MAX_PRODUTOS);
+    int tamanho = carregarProdutos(listaDeProdutos, MAX_PRODUTOS);
     do {
         mostrarMenu();
         printf("Escolha uma opcao: ");
@@ -16,27 +16,27 @@ int main() {
         switch(opcao) {
             case 1:
                 printf("Cadastrar Produto...\n");
-                cadastrarProduto(listaDeProdutos, &quantidadeLida);
+                cadastrarProduto(listaDeProdutos, &tamanho);
                 break;
             case 2:
                 printf("Consultar Produto...\n");
-                consultarProduto(listaDeProdutos,&quantidadeLida);
+                consultarProduto(listaDeProdutos,&tamanho);
                 break;
             case 3:
                 printf("Atualizar Estoque...\n");
-                atualizarEstoque(listaDeProdutos, &quantidadeLida);
+                atualizarEstoque(listaDeProdutos, &tamanho);
                 break;
             case 4:
                 printf("Listar Produtos...\n");
-                listarProdutos(listaDeProdutos, quantidadeLida);
+                listarProdutos(listaDeProdutos, tamanho);
                 break;
             case 5:
                 printf("Remover Produto...\n");
-                removerProduto(listaDeProdutos, &quantidadeLida);
+                removerProduto(listaDeProdutos, &tamanho);
                 break;
             case 6:
                 printf("Saindo...\n");
-                salvarProdutosNoArquivo(listaDeProdutos, quantidadeLida);
+                salvarProdutosNoArquivo(listaDeProdutos, tamanho);
                 break;
             default:
                 printf("Opcao invalida.\n");
